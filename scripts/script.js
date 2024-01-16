@@ -20,4 +20,9 @@ function createPost() {
               <p>${content}</p>
           </article>
       `;
-  }};
+      var mainContent = document.querySelector('main');
+      mainContent.insertBefore(postSection, mainContent.firstChild.nextSibling);
+      document.getElementById('username').value = '';
+      document.getElementById('new-post-content').value = '';
+  }
+}
