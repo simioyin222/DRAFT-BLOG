@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
-  var dateSpan = document.getElementById('post-date');
-  if (dateSpan) {
-      dateSpan.textContent = new Date().toLocaleDateString();
-  }
+  var form = document.getElementById('post-form');
+  form.onsubmit = function(event) {
+      event.preventDefault();
+      createPost();
+  };
 });
