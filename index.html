@@ -11,23 +11,31 @@
         <nav>
             <ul>
                 <li><a href="index.html">Home</a></li>
+                <!-- where i can add extra links (resume, about me page, other works) -->
             </ul>
         </nav>
     </header>
 
+    <!-- New blog post -->
+    <section>
+        <h2>Create a New Post</h2>
+        <form id="post-form">
+            <input type="text" id="username" placeholder="Your username" required>
+            <textarea id="new-post-content" placeholder="Write your post here..." required></textarea>
+            <button type="submit">Post</button>
+        </form>
+    </section>
+
     <main>
-        <article>
-            <header>
-                <h1>Welcome to My Blog</h1>
-                <p>Posted on <span id="post-date">[Date]</span></p>
-            </header>
+        <section id="announcement">
             <p>This is your first post! Start sharing your thoughts and experiences here.</p>
-            <!-- additonal post to add -->
-        </article>
+        </section>
+
+        <!-- Every blog post gets posted here  -->
     </main>
 
     <footer>
-        <p>© 2024 Similoluwa Oyinkolade. All rights reserved.</p>
+        <p>© 2024 Your Name. All rights reserved.</p>
     </footer>
 
     <script src="scripts/script.js"></script>
