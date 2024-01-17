@@ -5,7 +5,9 @@ const session = require('express-session');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcryptjs');
-const User = require('./models/User'); // Adjust the path as necessary
+const User = require('./models/User'); // Update 
+const Post = require('./models/Post'); // Update 
+const Comment = require('./models/Comment'); // Update 
 const app = express();
 const port = 3000;
 
@@ -18,55 +20,48 @@ mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTop
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(session({
-  secret: 'your session secret', // Replace with your secret
+  secret: 'your session secret', // Replace with your code
   resave: false,
   saveUninitialized: false,
 }));
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Passport Local Strategy
-passport.use(new LocalStrategy((username, password, done) => {
-  User.findOne({ username }, (err, user) => {
-    if (err) { return done(err); }
-    if (!user) { return done(null, false, { message: 'Incorrect username.' }); }
+// Passport configuration
+// ... Passport Local Strategy and Serialization/Deserialization ...
 
-    bcrypt.compare(password, user.password, (err, res) => {
-      if (res) {
-        return done(null, user);
-      } else {
-        return done(null, false, { message: 'Incorrect password.' });
-      }
-    });
-  });
-}));
+// Ensure user is authenticated middleware
+function isAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) return next();
+    res.status(401).json({ message: 'Not authenticated' });
+}
 
-passport.serializeUser((user, done) => done(null, user.id));
-passport.deserializeUser((id, done) => {
-  User.findById(id, (err, user) => done(err, user));
+// Routes for Blog Posts
+// ... Existing routes for creating and viewing blog posts ...
+
+// API Endpoint: Edit a blog post
+app.put('/api/posts/:id', isAuthenticated, (req, res) => {
+    const { title, content } = req.body;
+    Post.findOneAndUpdate({ _id: req.params.id, author: req.user._id }, { title, content }, { new: true })
+        .then(post => {
+            if (!post) return res.status(404).json({ message: 'Post not found or unauthorized' });
+            res.json(post);
+        })
+        .catch(err => res.status(500).json({ message: 'Error updating post' }));
 });
 
-// Routes
-app.post('/register', (req, res) => {
-  const { username, password } = req.body;
-  bcrypt.hash(password, 10, (err, hashedPassword) => {
-    if (err) throw err;
-    new User({ username, password: hashedPassword }).save()
-      .then(user => res.redirect('/login'))
-      .catch(err => console.log(err));
-  });
+// API Endpoint: Delete a blog post
+app.delete('/api/posts/:id', isAuthenticated, (req, res) => {
+    Post.findOneAndDelete({ _id: req.params.id, author: req.user._id })
+        .then(post => {
+            if (!post) return res.status(404).json({ message: 'Post not found or unauthorized' });
+            res.json({ message: 'Post deleted successfully' });
+        })
+        .catch(err => res.status(500).json({ message: 'Error deleting post' }));
 });
 
-app.post('/login', passport.authenticate('local', {
-  successRedirect: '/',
-  failureRedirect: '/login',
-  failureFlash: true
-}));
-
-app.get('/logout', (req, res) => {
-  req.logout();
-  res.redirect('/login');
-});
+// Routes for Comments
+// ... Implement routes for adding, editing, and deleting comments ...
 
 app.use(express.static('../public'));
 
