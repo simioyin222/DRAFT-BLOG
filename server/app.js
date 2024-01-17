@@ -10,7 +10,7 @@ const Post = require('./models/Post'); // Adjust path as necessary
 const app = express();
 const port = 3000;
 
-mongoose.connect('your-mongodb-connection-string', { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB Connected'))
   .catch(err => console.log(err));
 
