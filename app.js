@@ -28,18 +28,20 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.use(new LocalStrategy((username, password, done) => {
-  User.findOne({ username }, (err, user) => {
-    if (err) { return done(err); }
-    if (!user) { return done(null, false, { message: 'Incorrect username.' }); }
-
+  User.findOne({ username }).then(user => {
+    if (!user) {
+      return done(null, false, { message: 'Incorrect username.' });
+    }
     bcrypt.compare(password, user.password, (err, res) => {
       if (res) {
+        // Passwords match
         return done(null, user);
       } else {
+        // Passwords do not match
         return done(null, false, { message: 'Incorrect password.' });
       }
     });
-  });
+  }).catch(err => done(err));
 }));
 
 passport.serializeUser((user, done) => done(null, user.id));
