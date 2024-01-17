@@ -53,7 +53,7 @@ app.post('/register', (req, res) => {
   bcrypt.hash(password, 10, (err, hashedPassword) => {
     if (err) throw err;
     new User({ username, password: hashedPassword }).save()
-      .then(user => res.redirect('/login'))
+      .then(user => res.redirect('/')) // Redirect to homepage after registration
       .catch(err => console.log(err));
   });
 });
