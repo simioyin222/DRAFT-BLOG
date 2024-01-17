@@ -5,8 +5,8 @@ const session = require('express-session');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcryptjs');
-const User = require('./models/User'); // Adjust path as necessary
-const Post = require('./models/Post'); // Adjust path as necessary
+const User = require('./server/models/User'); // Adjust path as necessary
+const Post = require('./server/models/Post'); // Adjust path as necessary
 
 const app = express();
 const port = 3000;
