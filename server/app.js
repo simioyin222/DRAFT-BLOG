@@ -5,30 +5,27 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcryptjs');
 const User = require('./models/User'); // Adjust path as necessary
+const Post = require('./models/Post'); // Adjust path as necessary
 
 const app = express();
 const port = 3000;
 
-// MongoDB connection
 mongoose.connect('your-mongodb-connection-string', { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB Connected'))
   .catch(err => console.log(err));
 
-// Express body parser
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-// Express session
 app.use(session({
   secret: 'secret', // Replace with your secret in production
   resave: true,
   saveUninitialized: true
 }));
 
-// Passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Passport Local Strategy
 passport.use(new LocalStrategy((username, password, done) => {
   User.findOne({ username }, (err, user) => {
     if (err) { return done(err); }
@@ -36,17 +33,14 @@ passport.use(new LocalStrategy((username, password, done) => {
 
     bcrypt.compare(password, user.password, (err, res) => {
       if (res) {
-        // Passwords match
         return done(null, user);
       } else {
-        // Passwords do not match
         return done(null, false, { message: 'Incorrect password.' });
       }
     });
   });
 }));
 
-// Serialize and deserialize user instances to and from the session.
 passport.serializeUser((user, done) => done(null, user.id));
 passport.deserializeUser((id, done) => {
   User.findById(id, (err, user) => done(err, user));
@@ -67,7 +61,7 @@ app.post('/register', (req, res) => {
 app.post('/login', passport.authenticate('local', {
   successRedirect: '/',
   failureRedirect: '/login',
-  failureFlash: false // Set to true if using flash messages
+  failureFlash: false
 }));
 
 // User Logout Route
@@ -75,6 +69,10 @@ app.get('/logout', (req, res) => {
   req.logout();
   res.redirect('/login');
 });
+
+// Blog Post Routes
+// Add here the routes for creating, reading, updating, and deleting blog posts
+// (The code provided in the previous response)
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
