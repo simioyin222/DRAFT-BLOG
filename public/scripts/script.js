@@ -1,28 +1,32 @@
 document.addEventListener('DOMContentLoaded', function() {
-  var form = document.getElementById('post-form');
-  form.onsubmit = function(event) {
-      event.preventDefault();
-      createPost();
-  };
+    const loginForm = document.getElementById('login-form');
+    const postForm = document.getElementById('post-form');
+
+    loginForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        loginUser();
+    });
+
+    postForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        createPost();
+    });
+
+    loadPosts();
 });
 
-function createPost() {
-  var username = document.getElementById('username').value.trim();
-  var content = document.getElementById('new-post-content').value.trim();
-  if (username && content) {
-      var postSection = document.createElement('section');
-      var currentDate = new Date().toLocaleDateString();
-      postSection.innerHTML = `
-          <article>
-              <header>
-                  <h3>Posted by ${username} on ${currentDate}</h3>
-              </header>
-              <p>${content}</p>
-          </article>
-      `;
-      var mainContent = document.querySelector('main');
-      mainContent.insertBefore(postSection, mainContent.firstChild.nextSibling);
-      document.getElementById('username').value = '';
-      document.getElementById('new-post-content').value = '';
-  }
+function loginUser() {
+    const username = document.getElementById('login-username').value;
+    const password = document.getElementById('login-password').value;
+
+    fetch('http://localhost:3000/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password })
+    })
+    .then(response => response.json())
+    .then(data => console.log(data))
+    .catch(error => console.error('Error:', error));
 }
