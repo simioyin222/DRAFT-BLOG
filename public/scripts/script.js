@@ -48,3 +48,21 @@ function createPost() {
     })
     .catch(error => console.error('Error:', error));
 }
+
+function loadPosts() {
+    fetch('http://localhost:3000/posts')
+    .then(response => response.json())
+    .then(posts => {
+        const postsSection = document.getElementById('posts');
+        postsSection.innerHTML = ''; // Clear existing posts
+        posts.forEach(post => {
+            const postElement = document.createElement('article');
+            postElement.innerHTML = `
+                <header><h3>Posted by ${post.author.username}</h3></header>
+                <p>${post.content}</p>
+            `;
+            postsSection.appendChild(postElement);
+        });
+    })
+    .catch(error => console.error('Error:', error));
+}
