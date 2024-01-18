@@ -74,8 +74,56 @@ app.get('/logout', (req, res) => {
 });
 
 // Blog Post Routes
-// Add here the routes for creating, reading, updating, and deleting blog posts
-// (The code provided in the previous response)
+// POST route to create a new blog post
+app.post('/posts', (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.status(401).send('User not authenticated');
+  }
+  const newPost = new Post({
+    title: req.body.title,
+    content: req.body.content,
+    author: req.user._id 
+  });
+  newPost.save()
+    .then(post => res.json(post))
+    .catch(err => res.status(400).json('Error: ' + err));
+});
+
+// GET route to retrieve all blog posts
+app.get('/posts', (req, res) => {
+  Post.find()
+    .then(posts => res.json(posts))
+    .catch(err => res.status(400).json('Error: ' + err));
+});
+
+// PUT route to update a specific blog post
+app.put('/posts/:postId', (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.status(401).send('User not authenticated');
+  }
+  Post.findById(req.params.postId)
+    .then(post => {
+      if (post.author.toString() !== req.user._id.toString()) {
+        return res.status(403).send('Not authorized to edit this post');
+      }
+      post.title = req.body.title;
+      post.content = req.body.content;
+      post.save()
+        .then(() => res.json('Post updated!'))
+        .catch(err => res.status(400).json('Error: ' + err));
+    })
+    .catch(err => res.status(400).json('Error: ' + err));
+});
+
+// DELETE route to delete a specific blog post
+app.delete('/posts/:postId', (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.status(401).send('User not authenticated');
+  }
+  Post.findByIdAndDelete(req.params.postId)
+    .then(() => res.json('Post deleted.'))
+    .catch(err => res.status(400).json('Error: ' + err));
+});
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
