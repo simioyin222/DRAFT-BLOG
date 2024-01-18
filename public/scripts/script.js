@@ -30,3 +30,21 @@ function loginUser() {
     .then(data => console.log(data))
     .catch(error => console.error('Error:', error));
 }
+
+function createPost() {
+    const content = document.getElementById('new-post-content').value.trim();
+
+    fetch('http://localhost:3000/posts', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ content })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        loadPosts(); // Reload posts after creation
+    })
+    .catch(error => console.error('Error:', error));
+}
