@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const path = require('path');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const passport = require('passport');
@@ -10,7 +11,7 @@ const Post = require('./server/models/Post');
 const Comment = require('./server/models/Comment');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB Connected'))
@@ -18,13 +19,11 @@ mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTop
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
 app.use(session({
   secret: 'secret',
   resave: true,
   saveUninitialized: true
 }));
-
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -35,10 +34,8 @@ passport.use(new LocalStrategy((username, password, done) => {
     }
     bcrypt.compare(password, user.password, (err, res) => {
       if (res) {
-        
         return done(null, user);
       } else {
-        
         return done(null, false, { message: 'Incorrect password.' });
       }
     });
@@ -48,6 +45,12 @@ passport.use(new LocalStrategy((username, password, done) => {
 passport.serializeUser((user, done) => done(null, user.id));
 passport.deserializeUser((id, done) => {
   User.findById(id, (err, user) => done(err, user));
+});
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.post('/register', (req, res) => {
@@ -112,13 +115,12 @@ app.put('/posts/:postId', (req, res) => {
 
 app.delete('/posts/:postId', (req, res) => {
   if (!req.isAuthenticated()) {
-    return res.status(401).send('User not authenticated');
+    return res.status(401). send('User not authenticated');
   }
   Post.findByIdAndDelete(req.params.postId)
     .then(() => res.json('Post deleted.'))
     .catch(err => res.status(400).json('Error: ' + err));
 });
-
 
 app.post('/posts/:postId/comments', (req, res) => {
   if (!req.isAuthenticated()) {
@@ -133,7 +135,6 @@ app.post('/posts/:postId/comments', (req, res) => {
     .then(comment => res.json(comment))
     .catch(err => res.status(400).json('Error: ' + err));
 });
-
 
 app.delete('/comments/:commentId', (req, res) => {
   if (!req.isAuthenticated()) {
